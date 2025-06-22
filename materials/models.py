@@ -58,6 +58,7 @@ class Lesson(models.Model):
         on_delete=models.CASCADE,
         verbose_name="Курс",
         help_text="Укажите курс",
+        related_name="lessons",
     )
 
     class Meta:
