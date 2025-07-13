@@ -81,6 +81,13 @@ class Payment(models.Model):
         verbose_name="Способ оплаты",
     )
 
+    payment_url = models.URLField(
+        max_length=500,
+        null=True,
+        blank=True,
+        verbose_name="Ссылка на оплату",
+    )
+
     class Meta:
         verbose_name = "Платёж"
         verbose_name_plural = "Платежи"
