@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
+from config.tasks import send_course_update_email
 from materials.models import Course, Lesson, Subscription
 from materials.paginators import CustomPagination
 from materials.serializers import CourseDetailSerializer, CourseSerializer, LessonSerializer
@@ -16,6 +17,7 @@ from users.permissions import IsModer, IsOwner
 class CourseViewSet(ModelViewSet):
     queryset = Course.objects.all().order_by("id")
     pagination_class = CustomPagination
+    http_method_names = ["get", "post", "put", "patch", "delete"]
 
     def get_serializer_class(self):
         if self.action == "retrieve":
@@ -48,7 +50,19 @@ class CourseViewSet(ModelViewSet):
 
     @swagger_auto_schema(operation_description="Частично обновить курс (PATCH)")
     def partial_update(self, request, *args, **kwargs):
-        return super().partial_update(request, *args, **kwargs)
+        response = super().partial_update(request, *args, **kwargs)
+
+        course = self.get_object()
+        subscribers = Subscription.objects.filter(course=course).select_related("user")
+        print("📢 partial_update вызван")  # 👈 Добавь это
+
+        for sub in subscribers:
+            print(f"📧 Отправка письма на {sub.user.email}")  # 👈 И это
+
+        for sub in subscribers:
+            send_course_update_email.delay(sub.user.email, course.title)
+
+        return response
 
     @swagger_auto_schema(operation_description="Удалить курс")
     def destroy(self, request, *args, **kwargs):
@@ -128,6 +142,7 @@ class LessonDestroyApiView(DestroyAPIView):
 
 class SubscriptionAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    http_method_names = ["get", "post", "put", "patch", "delete"]
 
     @swagger_auto_schema(
         operation_description="Подписка/отписка на курс",
@@ -155,5 +170,9 @@ class SubscriptionAPIView(APIView):
         else:
             Subscription.objects.create(user=user, course=course)
             message = "Подписка добавлена"
+
+        subscribers = Subscription.objects.filter(course=course).select_related("user")
+        for sub in subscribers:
+            send_course_update_email.delay(sub.user.email, course.title)
 
         return Response({"message": message})
