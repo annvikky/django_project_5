@@ -9,6 +9,9 @@ readme = "README.md"
 python = "^3.12"
 python-dotenv = "^1.1.0"
 stripe = "^12.3.0"
+django = "*"
+gunicorn = "*"
+django-redis = "*"
 
 
 [tool.poetry.group.lint.dependencies]
