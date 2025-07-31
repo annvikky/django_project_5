@@ -18,6 +18,7 @@ schema_view = get_schema_view(
     permission_classes=(permissions.AllowAny,),
 )
 
+
 def index(request):
     return HttpResponse("Приложение успешно работает!")
 
