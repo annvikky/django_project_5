@@ -43,6 +43,17 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Проверка, передаётся ли SECRET_KEY
+      run: |
+        if [ -z "$SECRET_KEY" ]; then
+          echo "::error::SECRET_KEY is empty"
+          exit 1
+        else
+          echo "::notice::SECRET_KEY is set"
+        fi
+      env:
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
     - name: Run migrations
       run: python manage.py migrate
 
