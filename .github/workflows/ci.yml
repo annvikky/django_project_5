@@ -59,6 +59,7 @@ jobs:
     - name: Run tests
       env:
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        ANOTHER_VAR: value
       run: python manage.py test
 
   build:
