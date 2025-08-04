@@ -117,22 +117,20 @@ jobs:
     needs: build
 
     steps:
-    - name: Set environment variables
-      run: echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
+#    - name: Set environment variables
+#      run: echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
 
     - name: Set up SSH
       uses: webfactory/ssh-agent@v0.7.0
       with:
         ssh-private-key: ${{ secrets.SSH_KEY }}
 
-    - name: Deploy to Server
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-        sudo docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
-        sudo docker stop myapp || true
-        sudo docker rm myapp || true
-        sudo docker run -d --name myapp -p 80:8000 -e SECRET_KEY='${{ secrets.SECRET_KEY }}' ${{ secrets.DOCKER_HUB_USERNAME }}/myapp:${{ github.sha }}
+    - name: Deploy to Server via SSH + Docker Compose
+      run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << EOF
+        sudo bash -c '
+          cd /home/ubuntu/djando_project_5
+          git pull origin main
+          docker compose pull
+          docker compose up -d --build
+        '
         EOF
-      
-
-  

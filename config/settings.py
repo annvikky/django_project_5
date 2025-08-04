@@ -142,12 +142,14 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # LOGIN_URL = "users:login"
 
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+
 CACHE_ENABLED = True
 if CACHE_ENABLED:
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.redis.RedisCache",
-            "LOCATION": os.getenv("LOCATION"),
+            "LOCATION": REDIS_URL,
         }
     }
 
@@ -173,8 +175,8 @@ SWAGGER_SETTINGS = {
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
 
 
-CELERY_BROKER_URL = os.getenv("LOCATION", "redis://redis:6379/0")
-CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
 
 CELERY_TIMEZONE = TIME_ZONE
 
