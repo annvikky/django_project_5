@@ -3,6 +3,7 @@ from django.urls import include, path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
+from django.http import HttpResponse
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -17,10 +18,16 @@ schema_view = get_schema_view(
     permission_classes=(permissions.AllowAny,),
 )
 
+
+def index(request):
+    return HttpResponse("Приложение успешно работает!")
+
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("materials/", include("materials.urls", namespace="materials")),
     path("users/", include("users.urls", namespace="users")),
+    path('', index),
     path(
         "swagger/",
         schema_view.with_ui("swagger", cache_timeout=0),
