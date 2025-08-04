@@ -70,7 +70,7 @@ DATABASES = {
         "NAME": os.getenv("DATABASE_NAME"),
         "USER": os.getenv("DATABASE_USER"),
         "PASSWORD": os.getenv("DATABASE_PASSWORD"),
-        "HOST": os.getenv("DATABASE_HOST"),
+        "HOST": os.getenv("DATABASE_HOST", "db"),
         "PORT": os.getenv("DATABASE_PORT", default="5432"),
     }
 }
@@ -173,8 +173,8 @@ SWAGGER_SETTINGS = {
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
 
 
-CELERY_BROKER_URL = "redis://localhost:6379/0"
-CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+CELERY_BROKER_URL = os.getenv("LOCATION", "redis://redis:6379/0")
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 
 CELERY_TIMEZONE = TIME_ZONE
 
